@@ -54,5 +54,5 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy _site --project-name=wispy-breeze-0df6.dirkvis30.workers.dev
+          command: pages deploy _site --project-name=wispy-breeze-0df6
           gitHubToken: ${{ secrets.GITHUB_TOKEN }}
