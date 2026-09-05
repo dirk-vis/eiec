@@ -1,0 +1,21 @@
+{
+  // Deploys the built site (`_site/`, produced by `npm run build` + pagefind)
+  // as a Cloudflare Worker serving static assets -- Cloudflare's current
+  // recommended way to host a static site, replacing the older "Pages"
+  // product for new projects. No server-side Worker code needed; this is a
+  // plain static site.
+  //
+  // "wispy-breeze-0df6" reuses the (currently empty) Worker already created
+  // in the Cloudflare dashboard, so `wrangler deploy` just fills it in --
+  // no extra dashboard step needed. Rename it here (and it'll deploy under
+  // the new name instead) if you'd rather have something more memorable;
+  // that creates a new Worker rather than renaming the old one in place.
+  "name": "wispy-breeze-0df6",
+  "compatibility_date": "2026-09-05",
+  "assets": {
+    "directory": "./_site",
+    // Serves clean URLs like /records/r0000/ correctly regardless of
+    // whether a trailing slash was typed or linked to.
+    "html_handling": "auto-trailing-slash"
+  }
+}
