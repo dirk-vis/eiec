@@ -1,0 +1,237 @@
+:root {
+  color-scheme: light dark;
+  --bg: #fbfaf7;
+  --fg: #1f1c17;
+  --muted: #6b6355;
+  --accent: #7a3b2e;
+  --border: #ddd6c9;
+  --card-bg: #ffffff;
+  --highlight: #f4e9d8;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #17140f;
+    --fg: #eee7db;
+    --muted: #b4a996;
+    --accent: #e0a88f;
+    --border: #3a3226;
+    --card-bg: #221d16;
+    --highlight: #3a2f1f;
+  }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  line-height: 1.55;
+}
+
+.site-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.brand { font-weight: 700; text-decoration: none; color: var(--fg); }
+.poc-tag { font-weight: 400; color: var(--muted); font-size: 0.85em; }
+
+.site-header nav a {
+  margin-left: 1rem;
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 600;
+}
+.site-header nav a:hover { text-decoration: underline; }
+
+main {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem 4rem;
+}
+
+.site-footer {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 1rem 1.5rem 3rem;
+  color: var(--muted);
+  font-size: 0.9rem;
+  border-top: 1px solid var(--border);
+}
+
+h1 { margin-top: 0; }
+
+.record-meta {
+  color: var(--muted);
+  margin-bottom: 1.5rem;
+}
+.record-meta .author { font-weight: 600; color: var(--fg); }
+
+.record-text {
+  white-space: pre-wrap;
+  font-size: 1.05rem;
+}
+
+.stats {
+  color: var(--muted);
+  margin-bottom: 2rem;
+}
+
+.cta {
+  display: inline-block;
+  margin-top: 1rem;
+  padding: 0.6rem 1.1rem;
+  background: var(--accent);
+  color: #fff;
+  text-decoration: none;
+  border-radius: 6px;
+  font-weight: 600;
+}
+
+/* --- Search page --- */
+.search-layout {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: 2rem;
+  align-items: start;
+}
+@media (max-width: 700px) {
+  .search-layout { grid-template-columns: 1fr; }
+}
+
+.filters {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1rem;
+  background: var(--card-bg);
+}
+.filters h2 { font-size: 1rem; margin: 0 0 0.75rem; }
+.filter-group { margin-bottom: 1.5rem; }
+.filter-group legend { font-weight: 600; margin-bottom: 0.4rem; }
+
+#author-search-box {
+  width: 100%;
+  padding: 0.4rem 0.5rem;
+  margin-bottom: 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--bg);
+  color: var(--fg);
+}
+
+#author-list {
+  max-height: 220px;
+  overflow-y: auto;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 0.5rem;
+  background: var(--bg);
+}
+#author-list label {
+  display: block;
+  font-size: 0.92rem;
+  padding: 0.15rem 0;
+}
+#author-list .no-match { color: var(--muted); font-style: italic; font-size: 0.9rem; }
+
+.year-inputs { display: flex; gap: 0.5rem; align-items: center; }
+.year-inputs input { width: 100%; padding: 0.4rem; border: 1px solid var(--border); border-radius: 4px; background: var(--bg); color: var(--fg);}
+.year-hint { font-size: 0.8rem; color: var(--muted); margin-top: 0.35rem; }
+
+#search-box {
+  width: 100%;
+  font-size: 1.1rem;
+  padding: 0.6rem 0.8rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  margin-bottom: 1rem;
+  background: var(--card-bg);
+  color: var(--fg);
+}
+
+.result-count { color: var(--muted); margin-bottom: 1rem; }
+
+.result-card {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1rem 1.2rem;
+  margin-bottom: 1rem;
+  background: var(--card-bg);
+}
+.result-card h3 { margin: 0 0 0.25rem; }
+.result-card h3 a { color: var(--fg); text-decoration: none; }
+.result-card h3 a:hover { text-decoration: underline; }
+.result-card .meta { color: var(--muted); font-size: 0.9rem; margin-bottom: 0.5rem; }
+.result-card .excerpt mark { background: var(--highlight); color: inherit; }
+
+button.clear-btn {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 0.3rem 0.6rem;
+  cursor: pointer;
+  color: var(--fg);
+  font-size: 0.85rem;
+}
+
+/* --- Partner (Harland database) records ---
+   Same card/page shapes as "own" data, just visually flagged: a blue
+   accent instead of the site's usual brown, plus an explicit badge, so
+   it's never mistaken for content this project itself collected. */
+:root {
+  --partner-accent: #2b5b7a;
+  --partner-bg: #eaf2f7;
+  --partner-border: #b6d0e0;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --partner-accent: #7fb8dd;
+    --partner-bg: #16232c;
+    --partner-border: #2d4a5e;
+  }
+}
+
+.badge-partner {
+  display: inline-block;
+  background: var(--partner-bg);
+  color: var(--partner-accent);
+  border: 1px solid var(--partner-border);
+  border-radius: 999px;
+  padding: 0.15rem 0.65rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  margin-bottom: 0.5rem;
+}
+
+.result-card.partner {
+  border-color: var(--partner-border);
+  border-left: 4px solid var(--partner-accent);
+  background: var(--partner-bg);
+}
+.result-card.partner h3 a { color: var(--partner-accent); }
+.result-card.partner .partner-hint {
+  color: var(--muted);
+  font-size: 0.88rem;
+  font-style: italic;
+  margin: 0;
+}
+.result-card.partner .partner-hint a { color: var(--partner-accent); }
+
+.partner-notice {
+  background: var(--partner-bg);
+  border: 1px solid var(--partner-border);
+  border-left: 4px solid var(--partner-accent);
+  border-radius: 6px;
+  padding: 0.9rem 1.1rem;
+  color: var(--fg);
+}

@@ -1,0 +1,42 @@
+---
+pagination:
+  data: records
+  size: 1
+  alias: record
+permalink: "records/{{ record.id }}/index.html"
+layout: base.njk
+eleventyComputed:
+  title: "{{ record.title }} — {{ record.author }}"
+---
+{% if record.source == "partner" %}
+<article>
+  <p class="record-meta" data-pagefind-ignore>
+    <span class="badge badge-partner">Partner data — Harland database</span><br>
+    <span class="author" data-pagefind-filter="author" data-pagefind-meta="author">{{ record.author }}</span>
+    &middot; <span data-pagefind-meta="year_display">{{ record.year_display }}</span>
+    <span data-pagefind-meta="year_start:{{ record.year_start }}" style="display:none"></span><span data-pagefind-meta="year_end:{{ record.year_end }}" style="display:none"></span>
+    <span data-pagefind-meta="source:partner" style="display:none"></span><span data-pagefind-meta="original_url:{{ record.original_url }}" style="display:none"></span>
+  </p>
+  <div data-pagefind-body>
+    <h1 data-pagefind-meta="title">{{ record.title }}</h1>
+  </div>
+  <p class="partner-notice" data-pagefind-ignore>
+    This entry belongs to Philip Harland's <em>Ethnic Relations and Migration in the
+    Ancient World</em> database, not to this project's own collection. Only the title,
+    author, and date range are shown here — the full entry lives on his site.
+  </p>
+  <p data-pagefind-ignore><a class="cta" href="{{ record.original_url }}">View this entry on philipharland.com →</a></p>
+</article>
+{% else %}
+<article>
+  <p class="record-meta" data-pagefind-ignore>
+    <span class="author" data-pagefind-filter="author" data-pagefind-meta="author">{{ record.author }}</span>
+    &middot; <span data-pagefind-meta="year_display">{{ record.year_display }}</span>
+    <span data-pagefind-meta="year_start:{{ record.year_start }}" style="display:none"></span><span data-pagefind-meta="year_end:{{ record.year_end }}" style="display:none"></span>
+  </p>
+  <div data-pagefind-body>
+    <h1 data-pagefind-meta="title">{{ record.title }}</h1>
+    <div class="record-text">{{ record.text }}</div>
+  </div>
+</article>
+{% endif %}

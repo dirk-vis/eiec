@@ -1,0 +1,21 @@
+---
+layout: base.njk
+title: "DH Snippet Database — proof of concept"
+---
+<h1>Digital humanities snippet database</h1>
+<p class="stats">
+  {{ stats.total }} entries loaded for this proof of concept — {{ stats.ownTotal }} own
+  snippets (early Christian writings, full text shown) plus {{ stats.partnerTotal }}
+  <span class="badge-partner">partner</span> entries sampled from Philip Harland's
+  <em>Ethnic Relations and Migration in the Ancient World</em> database (title, author,
+  and date range only) — covering {{ stats.uniqueAuthors }} distinct authors/attributions
+  across both sources.
+</p>
+<p>
+  This is a working test of the architecture discussed in the project's planning document:
+  a fully static site (no server, no database) with client-side keyword search, a searchable
+  author filter, and a year-range filter that understands both BCE and CE dates. Partner
+  entries are marked with the blue badge above and link out to Harland's own site rather
+  than showing their text here.
+</p>
+<a class="cta" href="/search/">Go to search &amp; filter →</a>

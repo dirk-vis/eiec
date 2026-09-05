@@ -1,0 +1,14 @@
+{
+  "name": "dh-snippet-poc",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "build": "eleventy",
+    "postbuild": "pagefind --site _site",
+    "build:all": "npm run build && npm run postbuild"
+  },
+  "devDependencies": {
+    "@11ty/eleventy": "^2.0.1",
+    "pagefind": "^1.1.0"
+  }
+}

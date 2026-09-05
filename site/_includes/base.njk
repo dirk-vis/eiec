@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ title or "DH Snippet Database (proof of concept)" }}</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="/">DH Snippet Database <span class="poc-tag">— proof of concept</span></a>
+    <nav>
+      <a href="/">Home</a>
+      <a href="/search/">Search &amp; filter</a>
+    </nav>
+  </header>
+  <main>
+    {{ content | safe }}
+  </main>
+  <footer class="site-footer">
+    <p>Test data assembled from an older project's JSONL export. Dates shown are <strong>synthetic placeholders</strong>
+       generated to exercise the year-range filter — not scholarly claims about when these texts were written.</p>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,52 @@
+name: Publish site
+
+# Manual only, on purpose: nothing goes live until a person opens this repo's
+# "Actions" tab, picks "Publish site", and clicks "Run workflow". That click
+# is the review step -- check the spreadsheet looks right first, then publish.
+on:
+  workflow_dispatch: {}
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install site dependencies
+        run: npm install
+
+      - name: Pull the spreadsheet + build the data file
+        run: python3 transform.py
+
+      - name: Build the site (Eleventy)
+        run: npm run build
+
+      - name: Build the search index (Pagefind)
+        run: npx pagefind --site _site
+
+      # One-time setup needed before this step works -- see HOW-TO-ADD-AN-ENTRY.md
+      # and the README's "Setting up the automation" section:
+      #   1. Create a Cloudflare Pages project (any placeholder upload is fine).
+      #   2. Create a Cloudflare API token with "Cloudflare Pages: Edit" permission.
+      #   3. In this GitHub repo: Settings -> Secrets and variables -> Actions,
+      #      add CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID as secrets.
+      #   4. Replace REPLACE-WITH-YOUR-PAGES-PROJECT-NAME below with the exact
+      #      project name Cloudflare gave you.
+      - name: Deploy to Cloudflare Pages
+        uses: cloudflare/pages-action@v1
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          projectName: REPLACE-WITH-YOUR-PAGES-PROJECT-NAME
+          directory: _site

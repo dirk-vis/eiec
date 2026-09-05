@@ -1,0 +1,191 @@
+---
+layout: base.njk
+title: "Search & filter — DH Snippet Database"
+---
+<h1>Search &amp; filter</h1>
+
+<noscript>
+  <p><strong>This search interface needs JavaScript.</strong> Individual snippet pages
+  still work without it — see the <a href="/">full list</a>.</p>
+</noscript>
+
+<input id="search-box" type="text" placeholder="Search the text of every snippet…" autocomplete="off">
+
+<div class="search-layout">
+  <aside class="filters">
+    <h2>Filters</h2>
+
+    <div class="filter-group">
+      <legend>Author</legend>
+      <input id="author-search-box" type="text" placeholder="Type to narrow the author list…" autocomplete="off">
+      <div id="author-list"><p class="no-match">Loading authors…</p></div>
+    </div>
+
+    <div class="filter-group">
+      <legend>Year</legend>
+      <div class="year-inputs">
+        <input id="year-from" type="number" placeholder="From">
+        <span>–</span>
+        <input id="year-to" type="number" placeholder="To">
+      </div>
+      <p class="year-hint">Use negative numbers for BCE — e.g. <code>-100</code> for 100 BCE.
+      A snippet matches if its own date range overlaps the range you enter at all.</p>
+    </div>
+
+    <button type="button" class="clear-btn" id="clear-filters">Clear all filters</button>
+  </aside>
+
+  <div class="results">
+    <p class="result-count" id="result-count">Loading…</p>
+    <div id="results"></div>
+  </div>
+</div>
+
+<script type="module">
+  const resultCountEl = document.getElementById("result-count");
+  const resultsEl = document.getElementById("results");
+  const searchBox = document.getElementById("search-box");
+  const authorSearchBox = document.getElementById("author-search-box");
+  const authorListEl = document.getElementById("author-list");
+  const yearFromEl = document.getElementById("year-from");
+  const yearToEl = document.getElementById("year-to");
+  const clearBtn = document.getElementById("clear-filters");
+
+  let pagefind;
+  let allAuthors = [];      // sorted list of author names
+  let authorCounts = {};    // author -> count
+  const selectedAuthors = new Set();
+
+  function escapeHtml(str) {
+    return str.replace(/[&<>"']/g, (c) => ({
+      "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+    }[c]));
+  }
+
+  function renderAuthorList(filterText) {
+    const q = filterText.trim().toLowerCase();
+    const visible = q ? allAuthors.filter((a) => a.toLowerCase().includes(q)) : allAuthors;
+
+    if (visible.length === 0) {
+      authorListEl.innerHTML = `<p class="no-match">No authors match "${escapeHtml(filterText)}".</p>`;
+      return;
+    }
+
+    authorListEl.innerHTML = visible.map((name) => {
+      const id = "author-" + name.replace(/[^a-z0-9]/gi, "-");
+      const checked = selectedAuthors.has(name) ? "checked" : "";
+      const count = authorCounts[name] ?? 0;
+      return `<label for="${id}">
+        <input type="checkbox" id="${id}" value="${escapeHtml(name)}" ${checked}>
+        ${escapeHtml(name)} (${count})
+      </label>`;
+    }).join("");
+
+    authorListEl.querySelectorAll("input[type=checkbox]").forEach((cb) => {
+      cb.addEventListener("change", () => {
+        if (cb.checked) selectedAuthors.add(cb.value);
+        else selectedAuthors.delete(cb.value);
+        runSearch();
+      });
+    });
+  }
+
+  function yearRangeOverlaps(recordStart, recordEnd, from, to) {
+    if (from !== null && recordEnd < from) return false;
+    if (to !== null && recordStart > to) return false;
+    return true;
+  }
+
+  async function runSearch() {
+    if (!pagefind) return;
+
+    const query = searchBox.value.trim();
+    // Pagefind requires `null` (not "") to mean "no keyword, just filters" --
+    // an empty string is treated as a real (unmatchable) search term.
+    const pagefindQuery = query === "" ? null : query;
+    const filters = {};
+    if (selectedAuthors.size > 0) {
+      filters.author = Array.from(selectedAuthors);
+    }
+
+    const search = await pagefind.search(pagefindQuery, { filters });
+    let results = await Promise.all(search.results.map((r) => r.data()));
+
+    const from = yearFromEl.value !== "" ? Number(yearFromEl.value) : null;
+    const to = yearToEl.value !== "" ? Number(yearToEl.value) : null;
+
+    if (from !== null || to !== null) {
+      results = results.filter((r) => {
+        const start = Number(r.meta.year_start);
+        const end = Number(r.meta.year_end);
+        return yearRangeOverlaps(start, end, from, to);
+      });
+    }
+
+    renderResults(results);
+  }
+
+  function renderResults(results) {
+    resultCountEl.textContent = `${results.length} snippet${results.length === 1 ? "" : "s"} found`;
+
+    if (results.length === 0) {
+      resultsEl.innerHTML = `<p>No snippets match your search and filters.</p>`;
+      return;
+    }
+
+    resultsEl.innerHTML = results.map((r) => {
+      const isPartner = r.meta.source === "partner";
+      const href = isPartner ? r.meta.original_url : r.url;
+      const linkAttrs = isPartner ? ` target="_blank" rel="noopener"` : "";
+
+      if (isPartner) {
+        return `
+      <article class="result-card partner">
+        <span class="badge badge-partner">Partner data — Harland database</span>
+        <h3><a href="${escapeHtml(href)}"${linkAttrs}>${escapeHtml(r.meta.title || "Untitled")}</a></h3>
+        <p class="meta">${escapeHtml(r.meta.author || "Unknown / Anonymous")} · ${escapeHtml(r.meta.year_display || "")}</p>
+        <p class="partner-hint">Title and author only — the full entry lives on
+          <a href="${escapeHtml(href)}"${linkAttrs}>philipharland.com ↗</a></p>
+      </article>
+    `;
+      }
+
+      return `
+      <article class="result-card">
+        <h3><a href="${href}">${escapeHtml(r.meta.title || "Untitled")}</a></h3>
+        <p class="meta">${escapeHtml(r.meta.author || "Unknown / Anonymous")} · ${escapeHtml(r.meta.year_display || "")}</p>
+        <div class="excerpt">${r.excerpt}</div>
+      </article>
+    `;
+    }).join("");
+  }
+
+  clearBtn.addEventListener("click", () => {
+    searchBox.value = "";
+    authorSearchBox.value = "";
+    selectedAuthors.clear();
+    yearFromEl.value = "";
+    yearToEl.value = "";
+    renderAuthorList("");
+    runSearch();
+  });
+
+  searchBox.addEventListener("input", () => runSearch());
+  authorSearchBox.addEventListener("input", () => renderAuthorList(authorSearchBox.value));
+  yearFromEl.addEventListener("input", () => runSearch());
+  yearToEl.addEventListener("input", () => runSearch());
+
+  async function init() {
+    pagefind = await import("/pagefind/pagefind.js");
+    await pagefind.init();
+
+    const filters = await pagefind.filters();
+    authorCounts = filters.author || {};
+    allAuthors = Object.keys(authorCounts).sort();
+    renderAuthorList("");
+
+    await runSearch();
+  }
+
+  init();
+</script>
