@@ -48,5 +48,5 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          projectName: REPLACE-WITH-YOUR-PAGES-PROJECT-NAME
+          projectName: wispy-breeze-0df6
           directory: _site
