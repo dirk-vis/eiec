@@ -11,7 +11,6 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      deployments: write
     steps:
       - name: Check out the repo
         uses: actions/checkout@v7
@@ -38,21 +37,23 @@ jobs:
       - name: Build the search index (Pagefind)
         run: npx pagefind --site _site
 
-      # One-time setup needed before this step works -- see HOW-TO-ADD-AN-ENTRY.md
-      # and the README's "Setting up the automation" section:
-      #   1. Create a Cloudflare Pages project (any placeholder upload is fine).
-      #   2. Create a Cloudflare API token with "Cloudflare Pages: Edit" permission.
-      #   3. In this GitHub repo: Settings -> Secrets and variables -> Actions,
+      # One-time setup needed before this step works -- see the README's
+      # "Setting up the automation" section:
+      #   1. In the Cloudflare dashboard, create an API token using the
+      #      premade "Edit Cloudflare Workers" template, and note your
+      #      account ID.
+      #   2. In this GitHub repo: Settings -> Secrets and variables -> Actions,
       #      add CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID as secrets.
-      #   4. Replace REPLACE-WITH-YOUR-PAGES-PROJECT-NAME below with the exact
-      #      project name Cloudflare gave you.
+      # The Worker's name and static-assets config live in wrangler.jsonc,
+      # not here -- wrangler deploy reads that file automatically.
       #
-      # Cloudflare's older "pages-action" is deprecated -- this uses their
-      # current tool, wrangler-action, in Pages-deploy mode instead.
-      - name: Deploy to Cloudflare Pages
+      # This deploys as a Cloudflare Worker (with static assets), which is
+      # what Cloudflare currently recommends for new sites; their older
+      # "Pages" product is de-emphasized in favor of this, and its own
+      # deploy action (pages-action) is deprecated anyway.
+      - name: Deploy to Cloudflare Workers
         uses: cloudflare/wrangler-action@v4
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy _site --project-name=eiec
-          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
+          command: deploy
